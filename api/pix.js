@@ -2,75 +2,98 @@ export default async function handler(req, res) {
   // Configurações de Permissão (CORS)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== "POST") return res.status(405).json({ error: "Método não permitido" });
+  
+  // Pega a chave da Vercel
+  const SECRET_KEY = process.env.ABACASH_SECRET;
+  if (!SECRET_KEY) return res.status(500).json({ error: "Chave não configurada" });
 
   try {
-    const { amount, buyerName } = req.body;
-    
-    // Tenta pegar a chave da Vercel.
-    let SECRET_KEY = process.env.ABACASH_SECRET;
-    
-    if (!SECRET_KEY) {
-        // Fallback de segurança se a variável de ambiente falhar
-        // Coloque sua chave aqui se precisar testar direto:
-        // SECRET_KEY = "SUA_CHAVE_AQUI"; 
-        return res.status(500).json({ error: "Chave ABACASH não configurada" });
-    }
+    const { action } = req.body;
 
-    const MEUS_PRODUTOS = ["s2dwjdf1t"]; 
-    const produtoSorteado = MEUS_PRODUTOS[Math.floor(Math.random() * MEUS_PRODUTOS.length)];
+    // === 1. CRIAR O PIX ===
+    if (action === 'create' || !action) {
+        const { amount, buyerName } = req.body;
+        
+        // 🔴 PRODUTO FIXO SOLICITADO 🔴
+        const PRODUTO_ID = "b8796vs1h"; 
 
-    // ENVIO SEM DADOS (Conforme funcionou no seu Log)
-    const bodyToSend = {
-        action: "create",
-        product_id: produtoSorteado,
-        amount: Number(amount),
-        customer: {
-          name: buyerName || "Cliente"
-        }
-    };
+        const bodyCreate = {
+            action: "create",
+            product_id: PRODUTO_ID, 
+            amount: Number(amount),
+            customer: { name: buyerName || "Cliente" }
+        };
 
-    console.log("Gerando PIX (Modo Anônimo)...");
-
-    const response = await fetch("https://app.abacash.com/api/payment.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${SECRET_KEY}`
-      },
-      body: JSON.stringify(bodyToSend)
-    });
-
-    const jsonResponse = await response.json();
-    console.log("Sucesso Abacash:", JSON.stringify(jsonResponse));
-
-    // Lógica para pegar o código onde quer que ele esteja
-    const pixData = jsonResponse.data || {};
-    const code = pixData.qr_code || pixData.pix_code || jsonResponse.qr_code;
-    const urlImage = pixData.qr_image_url || pixData.qrcode_image || jsonResponse.qr_image_url;
-
-    if (code) {
-        return res.status(200).json({
-            // Manda com TODOS os nomes para o HTML não se perder
-            qr_code_text: code,  // Para HTML versão Dice
-            copiaecola: code,    // Para HTML versão antiga
-            code: code,          // Garantia extra
-            qrCodeUrl: urlImage,
-            transaction_id: jsonResponse.id || pixData.id || pixData.payment_id
+        const response = await fetch("https://app.abacash.com/api/payment.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SECRET_KEY}` },
+            body: JSON.stringify(bodyCreate)
         });
+
+        const json = await response.json();
+        const data = json.data || {};
+        
+        // Extrai os dados importantes
+        const code = data.qr_code || data.pix_code || json.qr_code;
+        const img = data.qr_image_url || data.qrcode_image || json.qr_image_url;
+        // O ID do pagamento é CRUCIAL para verificar se caiu depois
+        const pid = data.payment_id || json.payment_id || data.id;
+
+        if (code) {
+            return res.status(200).json({
+                qr_code_text: code,
+                qrCodeUrl: img,
+                payment_id: pid 
+            });
+        }
+        return res.status(400).json({ error: "Erro ao criar PIX", detail: json });
     }
 
-    return res.status(400).json({ 
-        error: "Erro na operadora", 
-        detail: jsonResponse.message 
-    });
+    // === 2. VERIFICAR SE O PAGAMENTO CAIU E GERAR NÚMEROS ===
+    if (action === 'check_status') {
+        const { payment_id, qtde_numeros } = req.body;
+
+        const response = await fetch("https://app.abacash.com/api/payment.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SECRET_KEY}` },
+            body: JSON.stringify({ action: "check_status", payment_id: payment_id })
+        });
+
+        const json = await response.json();
+        const status = json.data?.status || json.status;
+
+        // Se estiver PAGO (approved ou paid), geramos os números
+        if (status === 'approved' || status === 'paid') {
+            const numeros = new Set();
+            const total = parseInt(qtde_numeros) || 1;
+            
+            // Gera números aleatórios únicos (000000 - 999999)
+            // Lógica de segurança para não travar se pedir números demais
+            const maxTentativas = total * 2; 
+            let tentativas = 0;
+
+            while(numeros.size < total && tentativas < maxTentativas) {
+                const num = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+                numeros.add(num);
+                tentativas++;
+            }
+
+            return res.status(200).json({
+                status: 'approved',
+                numeros: Array.from(numeros)
+            });
+        }
+
+        // Se não, avisa que ainda tá pendente
+        return res.status(200).json({ status: 'pending' });
+    }
 
   } catch (error) {
-    console.error("Erro Fatal:", error);
-    return res.status(500).json({ error: "Erro interno", detail: error.message });
+    console.error("Erro Backend:", error);
+    return res.status(500).json({ error: "Erro interno", msg: error.message });
   }
 }
