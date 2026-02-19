@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
         const bodyCreate = {
             action: "create",
-            product_id: PRODUTO_ID, 
+            product_id: b8796vs1h, 
             amount: Number(amount),
             customer: { name: buyerName || "Cliente" }
         };
@@ -97,3 +97,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Erro interno", msg: error.message });
   }
 }
+
