@@ -190,7 +190,7 @@
                         <p style="color: #ffffffde;">Por apenas </p>
                         <div style="background-color: #1a1a1a;">
                             R$
-                            <span class="price-value">5,01</span>
+                            <span class="price-value">0,03</span>
                         </div>
                     </span>
                 </div>
@@ -243,7 +243,7 @@
                         <p style="color: #ffffff;background-color: ##6c757d; border: none;">Quanto mais títulos, mais chances de ganhar!</p>
                         <div class="content-select">
                             <div class="select select-1" style="border: none; background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); cursor: pointer; pointer-events: auto;">
-                                <span>+<h3>200</h3></span>
+                                <span>+<h3>100</h3></span>
                                 <p style="color:#fff;">SELECIONAR</p>
                             </div>
                             <div class="select select-2 popular" style="background-color: rgb(233, 209, 195); border: 2px solid rgb(255, 59, 59); border-radius: 12px; cursor: pointer; pointer-events: auto;">
@@ -272,7 +272,7 @@
                         <div class="add-to-cart">
                             <div style="background-color:#1f2832; border:1px solid rgba(255,255,255,0.15); border-radius:12px;" class="quantity-input">
                                 <i class="bi bi-dash-circle js-qty-minus" style="color:#ffffff; cursor:pointer;"></i>
-                                <input class="input-quantity" type="number" value="167" style="background-color:#1f2832; border:1px solid #3a4754; color:#ffffff;">
+                                <input class="input-quantity" type="number" value="1" style="background-color:#1f2832; border:1px solid #3a4754; color:#ffffff;">
                                 <i class="bi bi-plus-circle-fill js-qty-plus" style="color:#ffffff; cursor:pointer;"></i>
                                 <input class="max-value" type="hidden" value="30000">
                             </div>
@@ -280,7 +280,7 @@
                                 <i class="bi bi-check-circle" style="color:#ffffff; font-size:20px; margin-right:10px;"></i>
                                 <span>
                                     <h3>Quero Participar</h3>
-                                    <span class="participate" style="color:#ffffff;">R$ <p class="price-participate" style="color:#ffffff;">5,01</p></span>
+                                    <span class="participate" style="color:#ffffff;">R$ <p class="price-participate" style="color:#ffffff;">0,03</p></span>
                                 </span>
                             </button>
                         </div>
@@ -644,20 +644,19 @@ document.addEventListener('DOMContentLoaded', function(){
     updateSlide();
   });
 
-  // ====== 2. LÓGICA DE PREÇO ATUALIZADA (MÍNIMO 167) ======
-  const MIN_QTY = 167; // Mínimo novo
-  const UNIT_PRICE = 0.03; // Preço unitário mantido
+  // ====== 2. LÓGICA DE PREÇO (MÍNIMO 1 PARA TESTE) ======
+  const MIN_QTY = 1; // MÍNIMO ALTERADO PARA 1 PARA TESTE
+  const UNIT_PRICE = 0.03; // Preço unitário
   const qtyInput = document.querySelector('.input-quantity');
   const priceDisplay = document.querySelector('.price-participate');
 
   function updatePrice() {
     let q = parseInt(qtyInput.value) || MIN_QTY;
-    if (q < MIN_QTY) q = MIN_QTY; // Força mínimo 167
+    if (q < MIN_QTY) q = MIN_QTY; // Força mínimo 1
     
     qtyInput.value = q;
     
     // Cálculo: Quantidade * 0.03
-    // Ex: 167 * 0.03 = 5.01
     const total = q * UNIT_PRICE;
     
     if(priceDisplay) priceDisplay.innerText = total.toFixed(2).replace('.', ',');
@@ -686,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function(){
     sel.addEventListener('click', () => {
       const val = parseInt(sel.querySelector('h3')?.innerText);
       if(val) { 
-          // Se o botão for menor que o mínimo, ajusta para o mínimo
+          // Se o botão for menor que o mínimo, ajusta (botões continuam funcionando normal)
           qtyInput.value = (val < MIN_QTY) ? MIN_QTY : val; 
           updatePrice(); 
       }
@@ -748,7 +747,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(pageHome) pageHome.classList.add('is-hidden');
 
     const qty = parseInt(qtyInput.value);
-    const amountTotal = qty * UNIT_PRICE; // Recalcula o total exato (167 * 0.03 = 5.01)
+    const amountTotal = qty * UNIT_PRICE; // Recalcula o total exato
     const buyerName = document.getElementById('ckName').value;
 
     try {
@@ -868,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function(){
       });
   });
 
-  // Inicializar com 167
+  // Inicializar com 1
   updatePrice();
   
   // Timer Double Chance
