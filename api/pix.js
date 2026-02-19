@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // 1. Configurações de Permissão (CORS)
+  // Configurações de Permissão (CORS)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -10,32 +10,31 @@ export default async function handler(req, res) {
 
   try {
     const { amount, buyerName } = req.body;
-
-    // Tenta pegar a chave da Vercel. Se não tiver, use a fixa para teste (descomente a linha de baixo)
+    
+    // Tenta pegar a chave da Vercel.
     let SECRET_KEY = process.env.ABACASH_SECRET;
-    // SECRET_KEY = "SUA_CHAVE_ABACASH_AQUI"; 
-
+    
     if (!SECRET_KEY) {
-        return res.status(500).json({ error: "Chave ABACASH_SECRET não configurada na Vercel" });
+        // Fallback de segurança se a variável de ambiente falhar
+        // Coloque sua chave aqui se precisar testar direto:
+        // SECRET_KEY = "SUA_CHAVE_AQUI"; 
+        return res.status(500).json({ error: "Chave ABACASH não configurada" });
     }
 
-    // SEU PRODUTO
     const MEUS_PRODUTOS = ["s2dwjdf1t"]; 
     const produtoSorteado = MEUS_PRODUTOS[Math.floor(Math.random() * MEUS_PRODUTOS.length)];
 
-    // 🔥 CONFIGURAÇÃO LIMPA (SEM DADOS)
-    // Estamos enviando APENAS o necessário.
+    // ENVIO SEM DADOS (Conforme funcionou no seu Log)
     const bodyToSend = {
         action: "create",
         product_id: produtoSorteado,
         amount: Number(amount),
         customer: {
           name: buyerName || "Cliente"
-          // CPF, EMAIL e TELEFONE foram removidos propositalmente
         }
     };
 
-    console.log("Enviando para Abacash (Modo Sem Dados):", JSON.stringify(bodyToSend));
+    console.log("Gerando PIX (Modo Anônimo)...");
 
     const response = await fetch("https://app.abacash.com/api/payment.php", {
       method: "POST",
@@ -47,27 +46,27 @@ export default async function handler(req, res) {
     });
 
     const jsonResponse = await response.json();
-    console.log("Resposta Abacash:", JSON.stringify(jsonResponse));
+    console.log("Sucesso Abacash:", JSON.stringify(jsonResponse));
 
-    // Lê a resposta para encontrar o QR Code
+    // Lógica para pegar o código onde quer que ele esteja
     const pixData = jsonResponse.data || {};
-    // A Abacash às vezes manda 'qr_code', às vezes 'pix_code'
     const code = pixData.qr_code || pixData.pix_code || jsonResponse.qr_code;
     const urlImage = pixData.qr_image_url || pixData.qrcode_image || jsonResponse.qr_image_url;
 
     if (code) {
         return res.status(200).json({
-            // O frontend precisa de 'qr_code_text' para desenhar o QR Code
-            qr_code_text: code, 
+            // Manda com TODOS os nomes para o HTML não se perder
+            qr_code_text: code,  // Para HTML versão Dice
+            copiaecola: code,    // Para HTML versão antiga
+            code: code,          // Garantia extra
             qrCodeUrl: urlImage,
-            transaction_id: jsonResponse.id || pixData.id
+            transaction_id: jsonResponse.id || pixData.id || pixData.payment_id
         });
     }
 
-    // Se falhar, retorna o erro detalhado
     return res.status(400).json({ 
         error: "Erro na operadora", 
-        detail: jsonResponse.message || "Seu produto pode estar exigindo CPF no painel." 
+        detail: jsonResponse.message 
     });
 
   } catch (error) {
