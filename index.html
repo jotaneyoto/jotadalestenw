@@ -104,6 +104,20 @@
         .container-double-chance { background: linear-gradient(90deg, #1a1a1a, #484848); }
         .progress-bar-inner { height: 40px; width: 100%; background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #313131 10px, #313131 20px); background-size: 195% 140%; animation: progress-animation 3s linear infinite; }
         .progress-bar-double-chance { background-color: #1a1a1a; }
+
+        /* --- CSS DO MODAL DE SUCESSO (NOVO) --- */
+        #modalSuccess { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999999; overflow-y: auto; }
+        #modalSuccess.is-visible { display: block; }
+        .success-card { width: min(600px, 92vw); margin: 40px auto; background: #161c24; border-radius: 12px; overflow: hidden; font-family: sans-serif; }
+        .success-header { background: #1f2a38; padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .success-icon { width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 50%; background: rgba(40, 167, 69, 0.2); color: #28a745; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .success-body { padding: 20px; color: #fff; }
+        .info-group { margin-bottom: 15px; font-size: 14px; line-height: 1.6; }
+        .info-label { color: #a0a0a0; font-weight: bold; }
+        .info-val { color: #fff; float: right; }
+        .numbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding: 10px; background: #0f131a; border-radius: 8px; }
+        .lucky-number { background: #ff3b3b; color: #fff; padding: 6px 4px; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px; letter-spacing: 1px; }
+        .btn-close-success { display: block; width: 100%; padding: 15px; background: #28a745; color: #fff; border: none; font-weight: bold; cursor: pointer; text-align: center; }
     </style>
 </head>
 
@@ -176,7 +190,7 @@
                         <p style="color: #ffffffde;">Por apenas </p>
                         <div style="background-color: #1a1a1a;">
                             R$
-                            <span class="price-value">0,03</span>
+                            <span class="price-value">5,01</span>
                         </div>
                     </span>
                 </div>
@@ -229,7 +243,7 @@
                         <p style="color: #ffffff;background-color: ##6c757d; border: none;">Quanto mais títulos, mais chances de ganhar!</p>
                         <div class="content-select">
                             <div class="select select-1" style="border: none; background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); cursor: pointer; pointer-events: auto;">
-                                <span>+<h3>100</h3></span>
+                                <span>+<h3>200</h3></span>
                                 <p style="color:#fff;">SELECIONAR</p>
                             </div>
                             <div class="select select-2 popular" style="background-color: rgb(233, 209, 195); border: 2px solid rgb(255, 59, 59); border-radius: 12px; cursor: pointer; pointer-events: auto;">
@@ -258,7 +272,7 @@
                         <div class="add-to-cart">
                             <div style="background-color:#1f2832; border:1px solid rgba(255,255,255,0.15); border-radius:12px;" class="quantity-input">
                                 <i class="bi bi-dash-circle js-qty-minus" style="color:#ffffff; cursor:pointer;"></i>
-                                <input class="input-quantity" type="number" value="100" style="background-color:#1f2832; border:1px solid #3a4754; color:#ffffff;">
+                                <input class="input-quantity" type="number" value="167" style="background-color:#1f2832; border:1px solid #3a4754; color:#ffffff;">
                                 <i class="bi bi-plus-circle-fill js-qty-plus" style="color:#ffffff; cursor:pointer;"></i>
                                 <input class="max-value" type="hidden" value="30000">
                             </div>
@@ -266,7 +280,7 @@
                                 <i class="bi bi-check-circle" style="color:#ffffff; font-size:20px; margin-right:10px;"></i>
                                 <span>
                                     <h3>Quero Participar</h3>
-                                    <span class="participate" style="color:#ffffff;">R$ <p class="price-participate" style="color:#ffffff;">3,00</p></span>
+                                    <span class="participate" style="color:#ffffff;">R$ <p class="price-participate" style="color:#ffffff;">5,01</p></span>
                                 </span>
                             </button>
                         </div>
@@ -562,6 +576,47 @@
   </div>
 </div>
 
+<div id="modalSuccess">
+    <div class="success-card">
+        <div class="success-header">
+            <div class="success-icon">✓</div>
+            <h3 style="margin:0; color:#fff;">Pagamento Identificado!</h3>
+            <p style="margin:5px 0 0; color:#a0a0a0; font-size:13px;">Seu pagamento foi aprovado</p>
+        </div>
+        
+        <div class="success-body">
+            <div style="background:#1f2a38; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <div class="info-group">
+                    <span class="info-label">Comprador:</span>
+                    <span class="info-val" id="scName">...</span>
+                </div>
+                <div style="clear:both;"></div>
+                <div class="info-group">
+                    <span class="info-label">Data/Horário:</span>
+                    <span class="info-val" id="scDate">...</span>
+                </div>
+                <div style="clear:both;"></div>
+                <div class="info-group">
+                    <span class="info-label">Quantidade:</span>
+                    <span class="info-val" id="scQty">...</span>
+                </div>
+                <div style="clear:both;"></div>
+                <div class="info-group">
+                    <span class="info-label">Total:</span>
+                    <span class="info-val" style="color:#28a745;" id="scTotal">...</span>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+
+            <h4 style="font-size:14px; margin-bottom:10px;">SEUS TÍTULOS:</h4>
+            <div class="numbers-grid" id="scNumbersBox">
+                Aguardando geração...
+            </div>
+        </div>
+        <button class="btn-close-success" onclick="location.reload()">NOVA COMPRA</button>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   // ====== 1. CARROSSEL DE IMAGENS ======
@@ -589,28 +644,52 @@ document.addEventListener('DOMContentLoaded', function(){
     updateSlide();
   });
 
-  // ====== 2. LÓGICA DE PREÇO ======
-  const UNIT_PRICE = 0.03;
+  // ====== 2. LÓGICA DE PREÇO ATUALIZADA (MÍNIMO 167) ======
+  const MIN_QTY = 167; // Mínimo novo
+  const UNIT_PRICE = 0.03; // Preço unitário mantido
   const qtyInput = document.querySelector('.input-quantity');
   const priceDisplay = document.querySelector('.price-participate');
 
   function updatePrice() {
-    let q = parseInt(qtyInput.value) || 1;
-    if (q < 1) q = 1;
+    let q = parseInt(qtyInput.value) || MIN_QTY;
+    if (q < MIN_QTY) q = MIN_QTY; // Força mínimo 167
+    
     qtyInput.value = q;
-    if(priceDisplay) priceDisplay.innerText = (q * UNIT_PRICE).toFixed(2).replace('.', ',');
+    
+    // Cálculo: Quantidade * 0.03
+    // Ex: 167 * 0.03 = 5.01
+    const total = q * UNIT_PRICE;
+    
+    if(priceDisplay) priceDisplay.innerText = total.toFixed(2).replace('.', ',');
   }
 
   if(qtyInput) {
-    qtyInput.addEventListener('input', updatePrice);
-    document.querySelector('.js-qty-minus')?.addEventListener('click', () => { qtyInput.value--; updatePrice(); });
-    document.querySelector('.js-qty-plus')?.addEventListener('click', () => { qtyInput.value++; updatePrice(); });
+    qtyInput.addEventListener('change', updatePrice);
+    qtyInput.addEventListener('blur', updatePrice);
+    
+    document.querySelector('.js-qty-minus')?.addEventListener('click', () => { 
+        let q = parseInt(qtyInput.value) || MIN_QTY;
+        if(q > MIN_QTY) {
+            qtyInput.value = q - 1;
+            updatePrice();
+        }
+    });
+    
+    document.querySelector('.js-qty-plus')?.addEventListener('click', () => { 
+        let q = parseInt(qtyInput.value) || MIN_QTY;
+        qtyInput.value = q + 1;
+        updatePrice(); 
+    });
   }
 
   document.querySelectorAll('.select').forEach(sel => {
     sel.addEventListener('click', () => {
-      const val = sel.querySelector('h3')?.innerText;
-      if(val) { qtyInput.value = val; updatePrice(); }
+      const val = parseInt(sel.querySelector('h3')?.innerText);
+      if(val) { 
+          // Se o botão for menor que o mínimo, ajusta para o mínimo
+          qtyInput.value = (val < MIN_QTY) ? MIN_QTY : val; 
+          updatePrice(); 
+      }
     });
   });
 
@@ -630,6 +709,7 @@ document.addEventListener('DOMContentLoaded', function(){
   document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
+      updatePrice(); // Garante o mínimo antes de abrir
       document.getElementById('ckQty').textContent = qtyInput.value;
       open(overlays[0]);
     };
@@ -657,48 +737,50 @@ document.addEventListener('DOMContentLoaded', function(){
     closeAll(); open(overlays[2]);
   };
 
-  // ====== 4. API PIX REAL (INTEGRAÇÃO) ======
+  // ====== 4. API PIX REAL + POLLING + TELA DE SUCESSO ======
+  let intervaloCheck = null;
+
   document.getElementById('ckCreatePayment').onclick = async function() {
     closeAll();
+    updatePrice(); // Garante valor atualizado
+    
     if(loading) { loading.classList.add('is-open'); loading.style.display = 'block'; }
     if(pageHome) pageHome.classList.add('is-hidden');
 
     const qty = parseInt(qtyInput.value);
-    // IMPORTANTE: Calcula o valor total para enviar para a API (amount variável)
-    const amountTotal = Number((qty * UNIT_PRICE).toFixed(2));
-
-    const payload = {
-      amount: amountTotal, 
-      buyerName: document.getElementById('ckName').value,
-      buyerPhone: document.getElementById('ckPhone2').value,
-      qty: qty
-    };
+    const amountTotal = qty * UNIT_PRICE; // Recalcula o total exato (167 * 0.03 = 5.01)
+    const buyerName = document.getElementById('ckName').value;
 
     try {
+      // 1. CRIA O PIX
       const res = await fetch('/api/pix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ 
+            action: 'create', 
+            amount: amountTotal.toFixed(2), // Envia com 2 casas decimais
+            buyerName: buyerName 
+        })
       });
 
       const data = await res.json();
       if(loading) { loading.classList.remove('is-open'); loading.style.display = 'none'; }
 
-      if (!res.ok) throw new Error(data.error || 'Erro na API');
+      if (!res.ok) throw new Error(data.error || 'Erro ao gerar PIX');
 
-      // Preenche dados do PIX
-      document.getElementById('pixCopyPaste').textContent = data.copiaecola || "Erro: Código não gerado";
+      // 2. MOSTRA O QR CODE
+      document.getElementById('pixCopyPaste').textContent = data.qr_code_text;
       document.getElementById('pixTotal').textContent = amountTotal.toFixed(2).replace('.', ',');
-      document.getElementById('pixBuyer').textContent = payload.buyerName;
-      
+      document.getElementById('pixBuyer').textContent = buyerName;
       const qrImg = document.getElementById('pixQrImg');
-      if(data.qrCodeBase64 && qrImg) {
-          qrImg.src = "data:image/png;base64," + data.qrCodeBase64;
-      } else if (data.qrCodeUrl && qrImg) {
-          qrImg.src = data.qrCodeUrl;
-      }
-
+      if(data.qrCodeUrl && qrImg) qrImg.src = data.qrCodeUrl;
+      
       if(pix) { pix.classList.add('is-open'); pix.style.display = 'block'; }
+
+      // 3. INICIA A VERIFICAÇÃO (POLLING)
+      if (data.payment_id) {
+          monitorarPagamento(data.payment_id, qty, amountTotal, buyerName);
+      }
       
     } catch (err) {
       if(loading) loading.classList.remove('is-open');
@@ -706,6 +788,59 @@ document.addEventListener('DOMContentLoaded', function(){
       alert('Erro: ' + err.message);
     }
   };
+
+  function monitorarPagamento(pid, qty, total, name) {
+      if(intervaloCheck) clearInterval(intervaloCheck);
+
+      intervaloCheck = setInterval(async () => {
+          console.log("Verificando se pagou...");
+          try {
+              const res = await fetch('/api/pix', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                      action: 'check_status', 
+                      payment_id: pid,
+                      qtde_numeros: qty 
+                  })
+              });
+              
+              const data = await res.json();
+
+              // SE PAGOU:
+              if (data.status === 'approved' || data.status === 'paid') {
+                  clearInterval(intervaloCheck);
+                  
+                  // Fecha Modal PIX
+                  pix.classList.remove('is-open'); pix.style.display = 'none';
+                  
+                  // Preenche Tela de Sucesso
+                  document.getElementById('scName').textContent = name;
+                  document.getElementById('scQty').textContent = qty;
+                  document.getElementById('scTotal').textContent = "R$ " + total.toFixed(2).replace('.', ',');
+                  
+                  const agora = new Date();
+                  document.getElementById('scDate').textContent = agora.toLocaleDateString() + " às " + agora.toLocaleTimeString();
+
+                  // Gera os quadradinhos vermelhos com os números
+                  const grid = document.getElementById('scNumbersBox');
+                  grid.innerHTML = ""; // Limpa
+                  
+                  if(data.numeros && data.numeros.length > 0) {
+                      data.numeros.forEach(num => {
+                          const div = document.createElement('div');
+                          div.className = 'lucky-number';
+                          div.textContent = num;
+                          grid.appendChild(div);
+                      });
+                  }
+
+                  // Mostra o Modal de Sucesso
+                  document.getElementById('modalSuccess').classList.add('is-visible');
+              }
+          } catch (e) { console.error(e); }
+      }, 5000); // Confere a cada 5 segundos
+  }
 
   // Funções Extras
   document.getElementById('pixCopyBtn').onclick = function() {
@@ -733,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function(){
       });
   });
 
-  // Inicializar
+  // Inicializar com 167
   updatePrice();
   
   // Timer Double Chance
